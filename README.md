@@ -86,6 +86,28 @@ rrpc-core = "0.1"
 - [API Reference](docs/api-reference.md)
 - [Examples](examples/)
 
+## Security Model
+
+⚠️ **rRPC is designed for trusted code only.**
+
+**Fundamental limitations:**
+- Rust handlers run with full process privileges
+- No memory isolation between .NET and Rust  
+- Panics crash the entire application
+- Cannot sandbox handler execution
+
+**Use rRPC when:**
+- You control all Rust code
+- Handlers are as trusted as your application code
+- Process crash is acceptable failure mode
+
+**Do NOT use rRPC for:**
+- Untrusted plugins or user-supplied code
+- Security boundaries between components
+- Multi-tenant environments
+
+See [SECURITY.md](SECURITY.md) for detailed security considerations.
+
 ## Project Status
 
 **This is an experimental research project.** I'm currently developing rRPC solo and **not accepting outside contributions** at this time.

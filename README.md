@@ -120,10 +120,87 @@ I may open contributions in the future, but for now I'm keeping full control of 
 
 ## Use Cases
 
-- **Desktop Applications**: C# UI + Rust core (game engines, CAD tools, IDEs)
-- **Financial Systems**: F# quant models + Rust execution engine
-- **Plugin Architectures**: Safe, schema-validated plugins with capability-based permissions
-- **Web Applications**: TypeScript/Fable → WASM for compute-heavy operations
+rRPC fills a specific niche: **type-safe, schema-driven FFI for trusted environments** where you need native performance without network overhead.
+
+### Real-World Scenarios
+
+**🎮 Game Engines & Graphics**
+```fsharp
+// F# game logic calling high-performance Rust physics engine
+let updatePhysics (entities: Entity[]) =
+    RpcClient.call<Entity[], PhysicsResult> "physics_step" entities
+```
+- **Why rRPC**: Sub-microsecond latency for per-frame physics updates
+- **Alternative**: Raw FFI (unsafe, no type checking) or C++ (no F# integration)
+
+**💹 High-Frequency Trading**
+```fsharp
+// F# strategy engine calling Rust market data processing
+let analyzeBook (book: OrderBook) =
+    RpcClient.call<OrderBook, Signal> "analyze_market" book
+```
+- **Why rRPC**: <1μs latency critical for algorithmic trading
+- **Alternative**: gRPC adds 50μs-1ms overhead (unacceptable for HFT)
+
+**🖥️ Desktop Applications**
+```fsharp
+// Electron-like app: F# UI + Rust native APIs
+let readFile (path: string) =
+    RpcClient.call<string, byte[]> "fs_read" path
+```
+- **Why rRPC**: Type-safe native access without node.js dependencies
+- **Alternative**: Electron (large bundle) or raw P/Invoke (brittle)
+
+**🔬 Scientific Computing**
+```fsharp
+// F# notebook calling Rust numerical libraries
+let computeEigenvalues (matrix: float[][]) =
+    RpcClient.call<Matrix, Eigenvalues> "lapack_eig" matrix
+```
+- **Why rRPC**: Zero-copy arrays, native BLAS/LAPACK performance
+- **Alternative**: PythonNet (slow) or manual marshaling (error-prone)
+
+**🌐 WASM Applications**
+```typescript
+// TypeScript web app calling Rust WASM modules
+const result = await rpc.call<UserInput, ProcessedData>("process", input);
+```
+- **Why rRPC**: Type-safe WASM imports with schema validation
+- **Alternative**: Raw `WebAssembly.instantiate` (no types, manual serialization)
+
+**🔧 Developer Tools**
+```fsharp
+// F# build system calling Rust compiler toolchain
+let compile (source: SourceFile) =
+    RpcClient.call<SourceFile, CompileResult> "rustc_compile" source
+```
+- **Why rRPC**: Integrate Rust tooling into F# workflows with type safety
+- **Alternative**: Process spawning (slow, no structured data)
+
+**📊 Batch Processing & ETL**
+```fsharp
+// F# orchestration + Rust data processing
+let processChunk (chunk: DataChunk) =
+    RpcClient.call<DataChunk, ProcessedData> "transform" chunk
+```
+- **Why rRPC**: Process millions of records/sec with type-safe pipelines
+- **Alternative**: Spark/Flink (distributed overhead) or pandas (GIL-limited)
+
+### When to Use rRPC
+
+✅ **Desktop applications** where you control all code (CAD, IDEs, games)  
+✅ **Internal tools** and developer utilities  
+✅ **Scientific computing** with trusted numerical libraries  
+✅ **Financial systems** where microseconds matter and code is audited  
+✅ **WASM apps** for type-safe browser/native code sharing  
+✅ **Incremental migration** from monoliths to polyglot architectures  
+
+### When NOT to Use rRPC
+
+❌ **Plugin systems** with third-party code (use process isolation)  
+❌ **Multi-tenant SaaS** (use microservices with network boundaries)  
+❌ **Untrusted environments** (rRPC has no security sandboxing)  
+❌ **Simple apps** that don't need FFI performance
 
 ## Comparison
 

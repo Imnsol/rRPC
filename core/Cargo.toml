@@ -1,0 +1,22 @@
+[package]
+name = "rrpc-core"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "Core runtime for rRPC - type-safe schema-driven FFI"
+keywords = ["ffi", "rpc", "interop", "dotnet", "rust"]
+categories = ["api-bindings", "wasm"]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+parking_lot.workspace = true
+libc = "0.2"
+
+[[example]]
+name = "demo"
+path = "../examples/demo.rs"

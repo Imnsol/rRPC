@@ -1,0 +1,25 @@
+# Rust
+target/
+depot/
+Cargo.lock
+**/*.rs.bk
+*.pdb
+
+# F#
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+
+# IDEs
+.vs/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

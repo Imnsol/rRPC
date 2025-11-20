@@ -1,0 +1,14 @@
+[workspace]
+resolver = "2"
+members = ["core"]
+
+[workspace.package]
+version = "0.1.0"
+authors = ["Anthony"]
+license = "Apache-2.0"
+edition = "2021"
+repository = "https://github.com/Imnsol/rRPC"
+homepage = "https://github.com/Imnsol/rRPC"
+
+[workspace.dependencies]
+parking_lot = "0.12"

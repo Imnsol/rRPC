@@ -363,32 +363,38 @@ fn expensive_operation(input: &[u8]) -> Result<Vec<u8>, RpcError> {
 
 ## Vulnerability Reporting
 
-If you discover a security vulnerability in rRPC, please report it responsibly.
+**This is an experimental solo project with no formal support or SLA.**
 
-**DO NOT open a public GitHub issue.**
+If you discover a security issue in rRPC's code, you can:
 
-### Reporting Process
+1. **Open a public GitHub issue** describing the problem
+   - rRPC has no private data or production deployments to protect
+   - Public disclosure helps all users immediately
+   - No coordinated disclosure needed
 
-1. Email security details to: [your-email@example.com]
-2. Include:
-   - Description of the vulnerability
-   - Steps to reproduce
-   - Potential impact
-   - Suggested fix (if any)
-3. Allow 90 days for fix before public disclosure
+2. **Submit a pull request** with a fix
+   - Note: I'm not accepting contributions at this time, but appreciate the effort
+   - I may implement your suggested fix independently
 
-### Response Timeline
+3. **Fork and fix** on your own
+   - Apache-2.0 license allows this
+   - No obligation to report back
 
-- **24 hours:** Acknowledgment of report
-- **7 days:** Initial assessment and severity classification
-- **30 days:** Fix developed and tested (for critical issues)
-- **90 days:** Public disclosure (if applicable)
+### What to Include
 
-## Security Advisories
+- Description of the issue
+- Steps to reproduce
+- Potential impact
+- Code examples (if applicable)
 
-Security advisories will be published at:
-- GitHub Security Advisories: https://github.com/Imnsol/rRPC/security/advisories
-- Project releases page
+### Expectations
+
+- **No response timeline guarantees** - this is a solo research project
+- **No security patches** - use rRPC at your own risk
+- **No CVE assignments** - not at that maturity level yet
+- **No security advisories** - issues will be tracked as normal GitHub issues
+
+If you need enterprise-grade security response, rRPC is not the right tool. Consider gRPC or similar production-ready alternatives.
 
 ## Supported Versions
 

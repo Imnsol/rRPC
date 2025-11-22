@@ -37,6 +37,8 @@ pub const ERR_PARSE_ERROR: c_int = 3;
 pub const ERR_NOT_FOUND: c_int = 4;
 pub const ERR_SERIALIZATION: c_int = 5;
 pub const ERR_INTERNAL: c_int = 99;
+/// Error returned when input is too large for safety
+pub const ERR_TOO_LARGE: c_int = 6;
 
 /// Initialize the rRPC runtime
 ///
@@ -76,6 +78,24 @@ pub unsafe extern "C" fn rrpc_call(
     out_ptr: *mut *mut u8,
     out_len: *mut usize,
 ) -> c_int {
+    // Basic validation
+    const MAX_INPUT_LEN: usize = 10 * 1024 * 1024; // 10 MB
+
+    if method_ptr.is_null() {
+        return ERR_PARSE_ERROR;
+    }
+
+    if in_len > 0 && in_ptr.is_null() {
+        return ERR_PARSE_ERROR;
+    }
+
+    if in_len > MAX_INPUT_LEN {
+        return ERR_TOO_LARGE;
+    }
+
+    if out_ptr.is_null() || out_len.is_null() {
+        return ERR_INTERNAL;
+    }
     // Validate registry initialized
     let Some(registry) = GLOBAL_REGISTRY.get() else {
         return ERR_NOT_INITIALIZED;
@@ -156,5 +176,36 @@ mod tests {
         
         let result = reg.call("test", b"hello").unwrap();
         assert_eq!(result, b"hello");
+    }
+
+    #[test]
+    fn rrpc_call_null_method_returns_parse_error() {
+        unsafe { rrpc_init(); }
+
+        let mut out_ptr: *mut u8 = std::ptr::null_mut();
+        let mut out_len: usize = 0;
+        let rc = unsafe { rrpc_call(std::ptr::null::<c_char>(), b"".as_ptr(), 0, &mut out_ptr, &mut out_len) };
+        assert_eq!(rc, ERR_PARSE_ERROR);
+    }
+
+    #[test]
+    fn rrpc_call_oversized_input_returns_too_large() {
+        unsafe { rrpc_init(); }
+        // construct a dummy buffer larger than MAX_INPUT_LEN (10MB)
+        let large_size = 10 * 1024 * 1024 + 1;
+        let vec = vec![0u8; large_size];
+        let mut out_ptr: *mut u8 = std::ptr::null_mut();
+        let mut out_len: usize = 0;
+        let rc = unsafe { rrpc_call("test\0".as_ptr() as *const c_char, vec.as_ptr(), vec.len(), &mut out_ptr, &mut out_len) };
+        assert_eq!(rc, ERR_TOO_LARGE);
+    }
+
+    #[test]
+    fn rrpc_call_unknown_method_returns_unknown() {
+        unsafe { rrpc_init(); }
+        let mut out_ptr: *mut u8 = std::ptr::null_mut();
+        let mut out_len: usize = 0;
+        let rc = unsafe { rrpc_call("no_such_method\0".as_ptr() as *const c_char, b"".as_ptr(), 0, &mut out_ptr, &mut out_len) };
+        assert_eq!(rc, ERR_UNKNOWN_METHOD);
     }
 }

@@ -1,0 +1,24 @@
+schema: mycelium/v1
+
+types:
+  Node:
+    id: uuid
+    title: string
+    position: [f64;4]
+
+  HyperEdge:
+    id: string
+    nodes: [uuid]
+    label: string?
+
+ui:
+  WorkspaceCanvas:
+    size: { w: 120, h: 30 }
+    style: neon
+    children:
+      - NodeList:
+          source: "udg.list_nodes"
+          item_template: "NodeTile"
+          animations:
+            enter: spring(duration=320, damping=8)
+            exit: fade(150)

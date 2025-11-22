@@ -1,34 +1,28 @@
-# rRPC
+# rRPC — Type-safe schema-driven FFI for .NET ↔ Rust
 
-**Type-safe schema-driven FFI for .NET ↔ Rust**
+rRPC is a lightweight runtime and toolchain for safe, schema-driven cross-language function calls between .NET (F#/C#) and Rust. Instead of adding a network layer, rRPC uses a small C ABI (cdylib) shim and generated bindings so calls are fast, type-safe, and easy to generate.
 
-rRPC brings gRPC's type safety and code generation to local function calls, eliminating HTTP overhead for 10-100x lower latency.
+## Overview
 
-## Why rRPC?
+Why rRPC?
 
-Modern applications often need multiple languages:
-- **F#/C#** for business logic and type-safe domain modeling
-- **Rust** for performance-critical code and systems programming
-- **TypeScript** for web interfaces
+- Use-case: when you need safe, low-latency interop between F#/.NET and Rust (desktop apps, deterministic tooling, real-time UDG/graph ops)
+- Approach: schema-first bindings + a tiny native runtime (cdylib + P/Invoke) — no HTTP transport by default
+- Outcome: compile-time guarantees across languages, minimal marshaling overhead, and consistent codegen for Rust/F#/TS/WASM.
 
-Traditional solutions force you to choose:
-- **gRPC**: Type-safe but requires HTTP/2 (network overhead even for local calls)
-- **Raw FFI**: Fast but type-unsafe, manual marshaling, brittle interfaces
-- **tRPC**: TypeScript-only, still uses HTTP
+## Key features
 
-**rRPC gives you both**: gRPC's type safety + FFI's native performance.
+- Sub-millisecond local call latency (native FFI)
+- Schema-driven code generation for strong typing across languages
+- Multi-platform paths: native cdylib (desktop), WASM (browser)
+- Low dependency surface: generated bindings + a lightweight runtime
+- Licensed under Apache-2.0 (patent protection)
 
-## Features
+## Try it — quick example
 
-- ✅ **Sub-millisecond latency**: Native FFI (cdylib + P/Invoke), no network stack
-- ✅ **Compile-time safety**: Schema-driven codegen for F#/Rust/TypeScript
-- ✅ **Multi-platform**: Desktop (native), Web (WASM), Mobile (WASM)
-- ✅ **Zero runtime deps**: Just generated bindings + thin FFI layer
-- ✅ **Apache-2.0 licensed**: Patent protection for users and contributors
+Minimal, end-to-end example showing how a Rust `registry` exposes functions and an F# client calls them.
 
-## Quick Example
-
-**Rust (server):**
+**Rust (example handler):**
 ```rust
 use rrpc_core::{Registry, RpcError};
 
@@ -58,26 +52,23 @@ let main argv =
     0
 ```
 
-## Performance
+## Performance (summary)
 
-| Operation | rRPC | gRPC (localhost) | gRPC (network) |
-|-----------|------|------------------|----------------|
-| **Simple call** | <1μs | 50μs-1ms | 5-50ms |
-| **1MB payload** | <100μs | 2-5ms | 10-100ms |
-| **Throughput** | 1M+ calls/sec | ~10K calls/sec | ~1K calls/sec |
+Local FFI calls avoid HTTP framing and provide a much faster path for in-process cross-language interactions. Benchmarks are available in `docs/benchmarks.md`.
 
-## Installation
+## Getting started
 
-### Rust
-```toml
-[dependencies]
-rrpc-core = "0.1"
+From the project root you can build and run the demo example (Rust example registry + internal demo runner):
+
+```powershell
+# Build all Rust targets
+cargo build --release
+
+# Run the small demo (runs example registry handlers)
+cargo run --example demo
 ```
 
-### F#
-```fsharp
-#r "nuget: RRpc.FSharp, 0.1.0"
-```
+F# and other language bindings will be added to `bindings/` as codegen matures; see `docs/getting-started.md` for up-to-date instructions.
 
 ## Documentation
 
@@ -108,15 +99,11 @@ rrpc-core = "0.1"
 
 See [SECURITY.md](SECURITY.md) for detailed security considerations.
 
-## Project Status
+## Project status
 
-**This is an experimental research project.** I'm currently developing rRPC solo and **not accepting outside contributions** at this time.
+rRPC is an early-stage research project. The repo owner is currently developing rRPC solo and is not accepting outside contributions. The project is Apache-2.0 licensed — you're welcome to use and fork it.
 
-You're welcome to:
-- ✅ Use rRPC in your projects (Apache-2.0 license)
-- ✅ Fork and experiment on your own
-
-I may open contributions in the future, but for now I'm keeping full control of the codebase to move quickly and maintain architectural coherence.
+If you'd like to follow progress, see the short public roadmap in `docs/ROADMAP.md` and the longer living plan `NEXT_STEPS.md` (internal, detailed).
 
 ## Use Cases
 
@@ -212,54 +199,9 @@ let processChunk (chunk: DataChunk) =
 | **No Network** | ✅ | ❌ | ❌ | ✅ |
 | **Patent Protection** | ✅ Apache-2.0 | ✅ Apache-2.0 | ❌ MIT | ❌ Varies |
 
-## Roadmap
+## Roadmap (short public view)
 
-### v0.1.0 (Current)
-- [x] Core FFI runtime with function registry
-- [x] Error handling and type definitions
-- [x] Basic examples (echo, reverse)
-- [x] Apache-2.0 license with patent protection
-- [x] CI/CD pipeline
-
-### v0.2.0 (Schema & Multi-Platform)
-- [ ] **MSL Schema Compiler**: Custom schema language for type definitions
-  - Basic types (uuid, string, i32, f32, bytes, timestamp)
-  - Enums and composite types
-  - Code generation for F# and Rust
-- [ ] **F# Bindings**: P/Invoke wrappers and marshaling helpers
-  - Auto-generated from schemas
-  - Async/Task support
-- [ ] **WASM Support**: Compile to wasm32-unknown-unknown
-  - Same Rust code runs native and browser
-  - wasm-bindgen integration
-
-### v0.3.0 (Web & Security)
-- [ ] **TypeScript Bindings**: Browser/Node.js integration
-  - Generated from MSL schemas
-  - WASM FFI bridge
-- [ ] **Zero-Copy Optimization**: Direct buffer passing for large payloads
-  - Lifetime-safe borrowed slices
-  - Pinned memory support
-- [ ] **Capability System**: Permission-based security
-  - Declarative capability requirements in schemas
-  - Compile-time permission checks
-
-### v0.4.0 (Advanced Features)
-- [ ] **Time-Travel Helpers**: Event sourcing and replay utilities
-  - Automatic command logging
-  - State reconstruction APIs
-- [ ] **Benchmarking Suite**: Formal performance comparisons
-  - rRPC vs gRPC (localhost and network)
-  - rRPC vs tRPC
-  - rRPC vs raw FFI
-- [ ] **Migration Guide**: From gRPC/tRPC to rRPC
-
-### v1.0.0 (Stable Release)
-- [ ] Complete MSL compiler with versioning support
-- [ ] All language bindings production-ready
-- [ ] Stable API guarantees
-- [ ] Comprehensive documentation
-- [ ] Published to crates.io and nuget.org
+See `docs/ROADMAP.md` for a short timeline of our priority milestones. For a detailed, iterative plan, the repository also contains `NEXT_STEPS.md` (developer-focused, living roadmap).
 
 ## License
 

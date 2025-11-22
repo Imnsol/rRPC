@@ -11,6 +11,20 @@ Unlike traditional RPC solutions:
 - **Type-safe**: Schema-driven code generation
 - **Sub-microsecond latency**: 10-100x faster than gRPC for local calls
 
+## Quick start (try the demo)
+
+From the repository root run these commands in PowerShell to build and run the example demo:
+
+```powershell
+# Build all Rust crates (release recommended)
+cargo build --release
+
+# Run a small runtime/demo that registers example handlers
+cargo run --example demo
+```
+
+The demo shows a tiny registry with a few functions (echo, reverse) and demonstrates round-trips.
+
 ## Prerequisites
 
 ### Rust Development
@@ -200,6 +214,8 @@ See [WASM Guide](wasm-guide.md) for browser integration.
 - [Schema-Driven Development](schema-guide.md) - Use MSL for type-safe contracts
 - [Error Handling](error-handling.md) - Best practices for RPC errors
 - [Performance Tuning](performance.md) - Zero-copy and optimization tips
+
+See the public roadmap for high-level milestones: `docs/ROADMAP.md` (short view). For the detailed developer plan, see `NEXT_STEPS.md` at the project root.
 
 ## Common Issues
 
